@@ -85,31 +85,82 @@
 
   </div>
 
-  <script>
-    function verifyClaim() {
+<script>
+  const database = [
+    {
+      text: "إنما الأعمال بالنيات",
+      source: "صحيح البخاري",
+      reference: "حديث رقم 1"
+    },
+    {
+      text: "من كان يؤمن بالله واليوم الآخر فليقل خيرا أو ليصمت",
+      source: "صحيح البخاري وصحيح مسلم",
+      reference: "حديث مشهور في الصحيحين"
+    },
+    {
+      text: "الدين النصيحة",
+      source: "صحيح مسلم",
+      reference: "حديث معروف"
+    }
+  ];
 
-      const claim = document.getElementById("claim").value;
-      const result = document.getElementById("result");
+  function normalizeText(text) {
+    return text
+      .replace(/[ًٌٍَُِّْـ]/g, "")
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
-      if (!claim.trim()) {
-        alert("أدخل النص أولاً");
-        return;
-      }
+  function verifyClaim() {
+    const claim = document.getElementById("claim").value;
+    const result = document.getElementById("result");
 
-      result.style.display = "block";
+    if (!claim.trim()) {
+      alert("أدخل النص أولاً");
+      return;
+    }
 
+    const normalizedClaim = normalizeText(claim);
+
+    const match = database.find(item =>
+      normalizedClaim.includes(normalizeText(item.text)) ||
+      normalizeText(item.text).includes(normalizedClaim)
+    );
+
+    result.style.display = "block";
+
+    if (match) {
       result.innerHTML = `
         <h2>AMANAH Report</h2>
 
-        <p>🔎 جارٍ تحليل الادعاء...</p>
+        <p>✅ تم العثور على تطابق</p>
 
-        <p>
-          هذه النسخة الأولى من أمانة.
-          سيتم قريبًا ربطها بالمصادر والذكاء الاصطناعي.
+        <p><strong>النص:</strong><br>${match.text}</p>
+
+        <p><strong>المصدر:</strong><br>${match.source}</p>
+
+        <p><strong>المرجع:</strong><br>${match.reference}</p>
+
+        <p style="font-size:14px;color:#666;">
+          هذه نتيجة من قاعدة AMANAH التجريبية الحالية.
+        </p>
+      `;
+    } else {
+      result.innerHTML = `
+        <h2>AMANAH Report</h2>
+
+        <p>⚠️ لم نعثر على هذا النص في قاعدة البيانات الحالية.</p>
+
+        <p style="font-size:14px;color:#666;">
+          هذا لا يعني أن النص غير صحيح؛ فقط لم يتم العثور عليه ضمن المصادر المضافة حاليًا.
         </p>
       `;
     }
-  </script>
+  }
+</script>
+  
 
 </body>
 </html>
