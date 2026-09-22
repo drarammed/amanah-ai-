@@ -124,10 +124,28 @@
 
     const normalizedClaim = normalizeText(claim);
 
-    const match = database.find(item =>
-      normalizedClaim.includes(normalizeText(item.text)) ||
-      normalizeText(item.text).includes(normalizedClaim)
-    );
+function similarity(a, b) {
+  const wordsA = normalizeText(a).split(" ");
+  const wordsB = normalizeText(b).split(" ");
+
+  const commonWords = wordsA.filter(word => wordsB.includes(word));
+
+  return commonWords.length / Math.max(wordsA.length, wordsB.length);
+}
+
+let bestMatch = null;
+let bestScore = 0;
+
+database.forEach(item => {
+  const score = similarity(claim, item.text);
+
+  if (score > bestScore) {
+    bestScore = score;
+    bestMatch = item;
+  }
+});
+
+const match = bestScore >= 0.5 ? bestMatch : null;
 
     result.style.display = "block";
 
